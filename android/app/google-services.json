@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "887453903226",
+    "project_id": "semad-2658b",
+    "storage_bucket": "semad-2658b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:887453903226:android:0bf0b15f59ceb446e78ec3",
+        "android_client_info": {
+          "package_name": "com.example.locksys_hr"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBf5eOZqYW6ZzW9ynhTPwlZJ6iHE_QBeuo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

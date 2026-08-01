@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LockSys HR — معاينة الثيمات (أحمر / أبيض)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* القيم الافتراضية — تُستبدل عند اختيار ثيم */
+    --primary:#C21C24;
+    --secondary:#8B1214;
+    --accent:#E55B5F;
+    --bg:#F4F6F8;
+    --surface:#FFFFFF;
+    --text:#1E242B;
+    --text2:#6B7280;
+    --border:#E5E7EB;
+    --field:#F9FAFB;
+    --radius:16px;
+    --radius-sm:10px;
+    --btn-style:solid; /* solid | gradient */
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Cairo',system-ui,'Segoe UI',Tahoma,sans-serif;}
+  body{
+    background:#0f1115;
+    color:#e8eaed;
+    min-height:100vh;
+    padding:28px 20px 60px;
+  }
+  .page-head{max-width:1180px;margin:0 auto 26px;text-align:center;}
+  .page-head h1{font-size:26px;font-weight:800;letter-spacing:.2px;}
+  .page-head p{color:#9aa0a6;margin-top:8px;font-size:15px;}
+
+  .controls{
+    max-width:1180px;margin:0 auto 26px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
+  }
+  .toggle{
+    background:#1b1e24;border:1px solid #2a2e36;border-radius:999px;padding:6px;display:inline-flex;gap:4px;
+  }
+  .toggle button{
+    background:transparent;border:none;color:#cfd3d8;padding:8px 18px;border-radius:999px;cursor:pointer;font-weight:600;font-size:14px;transition:.2s;
+  }
+  .toggle button.active{background:#fff;color:#111;}
+
+  .layout{
+    max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:30px;align-items:start;
+  }
+  @media (max-width:920px){.layout{grid-template-columns:1fr;}.preview-wrap{order:-1;}}
+
+  /* ===== معرض الثيمات ===== */
+  .gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+  @media (max-width:560px){.gallery{grid-template-columns:1fr;}}
+  .theme-card{
+    background:#1b1e24;border:2px solid #262a32;border-radius:18px;padding:16px;cursor:pointer;transition:.2s;position:relative;
+  }
+  .theme-card:hover{transform:translateY(-3px);border-color:#3a3f49;}
+  .theme-card.selected{border-color:var(--cardPrimary);box-shadow:0 0 0 3px color-mix(in srgb, var(--cardPrimary) 30%, transparent);}
+  .theme-card .name{font-weight:700;font-size:15px;margin-bottom:4px;}
+  .theme-card .desc{font-size:12px;color:#9aa0a6;margin-bottom:12px;height:32px;}
+  .swatches{display:flex;gap:7px;margin-bottom:12px;}
+  .swatch{flex:1;height:34px;border-radius:8px;border:1px solid rgba(255,255,255,.08);}
+  .mini-gradient{height:30px;border-radius:8px;margin-bottom:12px;}
+  .mini-row{display:flex;align-items:center;gap:8px;}
+  .mini-btn{flex:1;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;}
+  .mini-chip{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;}
+  .selected-tag{position:absolute;top:12px;left:12px;background:var(--cardPrimary);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;display:none;}
+  .theme-card.selected .selected-tag{display:block;}
+
+  /* ===== معاينة الموبايل ===== */
+  .preview-wrap{position:sticky;top:20px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .phone{
+    width:340px;max-width:100%;background:var(--bg);border-radius:38px;padding:14px;
+    border:10px solid #11131a;box-shadow:0 30px 60px rgba(0,0,0,.5);overflow:hidden;
+  }
+  .notch{width:130px;height:22px;background:#11131a;border-radius:0 0 16px 16px;margin:-14px auto 10px;}
+  .screen{background:var(--bg);border-radius:24px;padding:20px 18px 16px;color:var(--text);}
+  .brand{
+    width:60px;height:60px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:4px auto 16px;
+    background:color-mix(in srgb,var(--primary) 10%,transparent);
+  }
+  .brand svg{width:28px;height:28px;stroke:var(--primary);}
+  .screen h2{text-align:center;font-size:20px;font-weight:800;color:var(--text);}
+  .screen .sub{text-align:center;font-size:12.5px;color:var(--text2);margin:6px 0 18px;line-height:1.6;}
+  .card{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;
+    box-shadow:0 8px 20px color-mix(in srgb,var(--primary) 5%,transparent);
+  }
+  .tabs{display:flex;background:var(--field);border-radius:var(--radius-sm);padding:4px;gap:4px;margin-bottom:16px;}
+  .tab{flex:1;text-align:center;padding:9px;border-radius:8px;font-size:13px;font-weight:700;color:var(--text2);}
+  .tab.active{background:var(--surface);color:var(--primary);box-shadow:0 2px 5px rgba(0,0,0,.06);}
+  .input{
+    display:flex;align-items:center;gap:9px;background:var(--field);border:1px solid var(--border);
+    border-radius:var(--radius-sm);padding:12px;margin-bottom:12px;
+  }
+  .input svg{width:18px;height:18px;stroke:var(--text2);flex-shrink:0;}
+  .input span{color:var(--text2);font-size:13px;}
+  .forgot{color:var(--primary);font-size:12.5px;font-weight:700;margin-bottom:14px;}
+  .btn-primary{
+    height:48px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;gap:8px;
+    color:#fff;font-weight:700;font-size:14.5px;
+  }
+  .btn-primary svg{width:18px;height:18px;stroke:#fff;}
+  .contact{text-align:center;margin:16px 0;color:var(--secondary);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .contact svg{width:18px;height:18px;stroke:var(--secondary);}
+  .dev{text-align:center;color:var(--text2);font-size:11px;}
+  .dev b{display:block;margin-top:6px;color:var(--text);font-size:15px;letter-spacing:.5px;}
+
+  .apply-note{
+    max-width:1180px;margin:30px auto 0;background:#161a20;border:1px solid #262a32;border-radius:14px;padding:16px 18px;color:#b8bdc4;font-size:13.5px;line-height:1.8;
+  }
+  .apply-note code{background:#0d1014;padding:2px 7px;border-radius:6px;color:#ffd5d5;font-family:monospace;direction:ltr;display:inline-block;}
+  .current-name{font-weight:800;color:#fff;}
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <h1>معاينة ثيمات LockSys HR — أحمر / أبيض</h1>
+  <p>اختر الثيم من المعرض لتراه مباشرة على شاشة الدخول. جرّب الأزرار الصلبة والمتدرّجة.</p>
+</div>
+
+<div class="controls">
+  <div class="toggle" id="btnStyleToggle">
+    <button data-style="solid" class="active">أزرار صلبة</button>
+    <button data-style="gradient">أزرار متدرّجة</button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- المعرض -->
+  <div class="gallery" id="gallery"></div>
+
+  <!-- معاينة الموبايل -->
+  <div class="preview-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="brand">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        </div>
+        <h2>تسجيل الدخول</h2>
+        <div class="sub">يرجى تسجيل الدخول للوصول إلى حسابك ومتابعة خدماتك</div>
+        <div class="card">
+          <div class="tabs">
+            <div class="tab active">اسم المستخدم</div>
+            <div class="tab">رقم الهاتف</div>
+          </div>
+          <div class="input"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>اسم المستخدم</span></div>
+          <div class="input"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>كلمة السر</span></div>
+          <div class="forgot">هل نسيت كلمة السر؟</div>
+          <div class="btn-primary" id="primaryBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+            تسجيل الدخول
+          </div>
+        </div>
+        <div class="contact">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          تواصل معنا
+        </div>
+        <div class="dev">تم تطوير التطبيق بواسطة<b>Lock Sys</b></div>
+      </div>
+    </div>
+    <div style="color:#9aa0a6;font-size:13px;">المعروض الآن: <span class="current-name" id="curName">—</span></div>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- ====== قسم جديد: شاشات HR (الهوم + البروفايل) — Crimson ====== -->
+<!-- ============================================================= -->
+<style>
+  .hr{
+    --p:#C21C24; --p2:#8B1214; --ac:#E55B5F;
+    --bg:#F4F6F8; --sf:#FFFFFF; --txt:#1E242B; --txt2:#6B7280;
+    --bd:#ECEEF1; --fld:#F4F6F8;
+    --grad:linear-gradient(135deg,#C21C24 0%,#8B1214 100%);
+    --grad-soft:linear-gradient(135deg,#E55B5F 0%,#C21C24 100%);
+    max-width:1180px;margin:60px auto 0;
+  }
+  .hr-head{text-align:center;margin-bottom:8px;}
+  .hr-head h2{font-size:23px;font-weight:800;color:#fff;}
+  .hr-head p{color:#9aa0a6;margin-top:7px;font-size:14px;}
+  .hr-badge{display:inline-flex;gap:8px;margin:14px 0 30px;justify-content:center;width:100%;}
+  .hr-badge span{background:#1b1e24;border:1px solid #2a2e36;color:#cfd3d8;font-size:12.5px;font-weight:600;padding:7px 14px;border-radius:999px;}
+  .hr-badge b{color:#E55B5F;}
+
+  .hr-phones{display:flex;gap:34px;justify-content:center;flex-wrap:wrap;}
+  .hrp{
+    width:330px;max-width:100%;background:#11131a;border-radius:40px;padding:12px;
+    border:1px solid #20242c;box-shadow:0 30px 70px rgba(0,0,0,.55);
+  }
+  .hrp-screen{background:var(--bg);border-radius:30px;overflow:hidden;height:680px;overflow-y:auto;position:relative;}
+  .hrp-screen::-webkit-scrollbar{width:0;}
+  .hr-label{text-align:center;color:#9aa0a6;font-size:13px;margin-top:12px;font-weight:600;}
+
+  /* عناصر مشتركة */
+  .hr *{color:inherit;}
+  .pad{padding:0 18px;}
+  .sec-title{display:flex;justify-content:space-between;align-items:center;margin:20px 0 12px;}
+  .sec-title h4{font-size:15.5px;font-weight:800;color:var(--txt);}
+  .sec-title a{font-size:12.5px;color:var(--p);font-weight:700;}
+  .ic{width:20px;height:20px;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ===== HOME ===== */
+  .home-top{display:flex;align-items:center;justify-content:space-between;padding:20px 18px 6px;}
+  .home-user{display:flex;align-items:center;gap:11px;}
+  .avatar{width:46px;height:46px;border-radius:14px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:16px;}
+  .home-user .greet small{color:var(--txt2);font-size:12px;}
+  .home-user .greet div{font-weight:800;font-size:16px;color:var(--txt);margin-top:2px;}
+  .home-user .greet b{font-size:11.5px;color:var(--p);font-weight:700;}
+  .home-icons{display:flex;gap:10px;}
+  .iconbtn{width:42px;height:42px;border-radius:13px;background:var(--sf);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;position:relative;color:var(--txt);}
+  .iconbtn .dot{position:absolute;top:9px;right:10px;width:8px;height:8px;background:var(--p);border-radius:50%;border:2px solid var(--sf);}
+
+  .search{margin:14px 18px 4px;display:flex;align-items:center;gap:10px;background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:12px 14px;color:var(--txt2);font-size:13.5px;}
+  .search .ic{stroke:var(--txt2);}
+
+  .welcome{margin:16px 18px 4px;background:var(--grad);border-radius:18px;padding:18px;color:#fff;position:relative;overflow:hidden;}
+  .welcome::after{content:"";position:absolute;left:-30px;top:-30px;width:120px;height:120px;background:rgba(255,255,255,.08);border-radius:50%;}
+  .welcome h3{font-size:16px;font-weight:800;margin-bottom:6px;}
+  .welcome p{font-size:12.5px;opacity:.9;line-height:1.6;max-width:78%;}
+  .welcome .wbtn{margin-top:12px;display:inline-flex;align-items:center;gap:7px;background:#fff;color:var(--p);font-weight:800;font-size:12.5px;padding:8px 14px;border-radius:10px;}
+  .welcome .wbtn .ic{stroke:var(--p);width:16px;height:16px;}
+
+  .kpis{display:flex;gap:10px;padding:16px 18px 0;}
+  .kpi{flex:1;background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:12px;text-align:center;}
+  .kpi b{display:block;font-size:18px;font-weight:800;color:var(--txt);}
+  .kpi small{font-size:10.5px;color:var(--txt2);}
+  .kpi.up b{color:#16A34A;} .kpi.warn b{color:#F59E0B;} .kpi.bad b{color:var(--p);}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .hcard{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:14px;position:relative;overflow:hidden;}
+  .hcard .chip{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:30px;}
+  .hcard .chip .ic{width:22px;height:22px;}
+  .hcard .num{position:absolute;left:14px;top:14px;font-size:22px;font-weight:800;color:var(--txt);}
+  .hcard .nm{font-weight:800;font-size:14px;color:var(--txt);}
+  .hcard .ds{font-size:11px;color:var(--txt2);margin-top:2px;}
+  .c-red .chip{background:rgba(194,28,36,.12);} .c-red .chip .ic{stroke:var(--p);}
+  .c-amber .chip{background:rgba(245,158,11,.14);} .c-amber .chip .ic{stroke:#F59E0B;}
+  .c-blue .chip{background:rgba(83,131,216,.14);} .c-blue .chip .ic{stroke:#3B82F6;}
+  .c-green .chip{background:rgba(22,163,74,.14);} .c-green .chip .ic{stroke:#16A34A;}
+  .c-violet .chip{background:rgba(139,92,246,.14);} .c-violet .chip .ic{stroke:#8B5CF6;}
+  .c-rose .chip{background:rgba(229,91,95,.16);} .c-rose .chip .ic{stroke:var(--ac);}
+
+  .notif{display:flex;align-items:center;gap:12px;background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:10px;}
+  .notif .nico{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:rgba(194,28,36,.1);flex-shrink:0;}
+  .notif .nico .ic{stroke:var(--p);width:19px;height:19px;}
+  .notif .nbody{flex:1;}
+  .notif .nbody b{font-size:13px;font-weight:700;color:var(--txt);}
+  .notif .nbody small{display:block;font-size:11px;color:var(--txt2);margin-top:2px;}
+  .notif .nt{font-size:10.5px;color:var(--txt2);}
+
+  /* bottom nav */
+  .bnav{position:sticky;bottom:0;margin-top:18px;background:var(--sf);border-top:1px solid var(--bd);display:flex;justify-content:space-around;align-items:center;padding:11px 8px 14px;}
+  .bnav .it{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--txt2);font-size:10px;font-weight:600;}
+  .bnav .it.active{color:var(--p);}
+  .bnav .it .ic{width:22px;height:22px;stroke:currentColor;}
+  .bnav .fab{width:52px;height:52px;border-radius:18px;background:var(--grad);display:flex;align-items:center;justify-content:center;margin-top:-26px;box-shadow:0 10px 20px rgba(194,28,36,.4);}
+  .bnav .fab .ic{stroke:#fff;width:26px;height:26px;}
+
+  /* ===== PROFILE ===== */
+  .pf-head{background:var(--grad);padding:26px 18px 64px;border-radius:0 0 28px 28px;color:#fff;position:relative;overflow:hidden;}
+  .pf-head::after{content:"";position:absolute;right:-40px;bottom:-40px;width:160px;height:160px;background:rgba(255,255,255,.08);border-radius:50%;}
+  .pf-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+  .pf-topbar .t{font-weight:800;font-size:16px;}
+  .pf-topbar .iconbtn{background:rgba(255,255,255,.15);border:none;color:#fff;}
+  .pf-id{display:flex;flex-direction:column;align-items:center;text-align:center;}
+  .pf-ava{width:84px;height:84px;border-radius:50%;border:3px solid rgba(255,255,255,.6);background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;}
+  .pf-id h3{margin-top:12px;font-size:19px;font-weight:800;}
+  .pf-id .role{font-size:12.5px;opacity:.9;margin-top:3px;}
+  .pf-id .code{margin-top:8px;font-size:11px;background:rgba(255,255,255,.18);padding:4px 12px;border-radius:999px;}
+
+  .pf-stats{margin:-44px 18px 0;background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:16px;display:flex;justify-content:space-around;box-shadow:0 12px 26px rgba(0,0,0,.08);}
+  .pf-stats .st{text-align:center;flex:1;}
+  .pf-stats .st b{display:block;font-size:19px;font-weight:800;color:var(--txt);}
+  .pf-stats .st small{font-size:10.5px;color:var(--txt2);}
+  .pf-stats .sep{width:1px;background:var(--bd);}
+
+  .row{display:flex;align-items:center;gap:13px;background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:13px 14px;margin-bottom:10px;}
+  .row .ri{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .row .rt{flex:1;}
+  .row .rt b{font-size:13.5px;font-weight:700;color:var(--txt);}
+  .row .rt small{display:block;font-size:11px;color:var(--txt2);margin-top:2px;}
+  .row .chev{stroke:var(--txt2);width:18px;height:18px;}
+  .row .rv{font-size:13px;font-weight:800;color:var(--p);}
+
+  .editbtn{margin:6px 18px 0;background:var(--grad);color:#fff;font-weight:800;font-size:14px;border-radius:14px;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .editbtn .ic{stroke:#fff;width:18px;height:18px;}
+  .logout{margin:10px 18px 18px;border:1px solid rgba(194,28,36,.3);color:var(--p);font-weight:800;font-size:14px;border-radius:14px;padding:13px;display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(194,28,36,.04);}
+  .logout .ic{stroke:var(--p);width:18px;height:18px;}
+</style>
+
+<div class="hr">
+  <div class="hr-head">
+    <h2>معاينة شاشات HR — الهوم & البروفايل</h2>
+    <p>مبنية على بيزنس الموارد البشرية بتاعكم — ثيم Crimson Corporate وأزرار متدرّجة.</p>
+  </div>
+  <div class="hr-badge">
+    <span>الثيم: <b>Crimson Corporate</b></span>
+    <span>الأزرار: <b>متدرّجة</b></span>
+    <span>RTL • خط Cairo</span>
+  </div>
+
+  <div class="hr-phones">
+
+    <!-- ============ HOME ============ -->
+    <div>
+      <div class="hrp"><div class="hrp-screen">
+        <div class="home-top">
+          <div class="home-user">
+            <div class="avatar">أ م</div>
+            <div class="greet">
+              <small>صباح الخير 👋</small>
+              <div>أحمد محمد</div>
+              <b>مدير موارد بشرية</b>
+            </div>
+          </div>
+          <div class="home-icons">
+            <div class="iconbtn"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot"></span></div>
+            <div class="iconbtn"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+          </div>
+        </div>
+
+        <div class="search"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>ابحث عن موظف، قسم، أو طلب…</div>
+
+        <div class="welcome">
+          <h3>نظرة عامة على اليوم</h3>
+          <p>تابع حضور وأداء فريقك واعتمد الطلبات المعلّقة بسهولة.</p>
+          <div class="wbtn"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg> عرض التقرير اليومي</div>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi up"><b>92%</b><small>نسبة الحضور</small></div>
+          <div class="kpi warn"><b>4</b><small>متأخرون</small></div>
+          <div class="kpi bad"><b>6</b><small>غائبون</small></div>
+        </div>
+
+        <div class="pad">
+          <div class="sec-title"><h4>الأقسام</h4><a>عرض الكل</a></div>
+          <div class="grid2">
+            <div class="hcard c-red"><div class="num">248</div><div class="chip"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.6"/><path d="M16 20a5 5 0 0 1 5-3"/></svg></div><div class="nm">الموظفين</div><div class="ds">إجمالي الموظفين</div></div>
+            <div class="hcard c-amber"><div class="num">6</div><div class="chip"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/><path d="M9.5 14.5l5 3M14.5 14.5l-5 3"/></svg></div><div class="nm">الغياب</div><div class="ds">غياب اليوم</div></div>
+            <div class="hcard c-blue"><div class="num">32</div><div class="chip"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="nm">الإضافي</div><div class="ds">ساعات هذا الشهر</div></div>
+            <div class="hcard c-green"><div class="num">12</div><div class="chip"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><path d="M21 16l-9 5-9-5"/><path d="M12 2l9 5-9 5-9-5 9-5z"/></svg></div><div class="nm">الإجازات</div><div class="ds">طلبات معلّقة</div></div>
+            <div class="hcard c-violet"><div class="num">₪</div><div class="chip"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><rect x="2" y="6" width="20" height="13" rx="2.5"/><circle cx="12" cy="12.5" r="2.6"/><path d="M6 6V4h12v2"/></svg></div><div class="nm">المرتبات</div><div class="ds">كشف هذا الشهر</div></div>
+            <div class="hcard c-rose"><div class="num">9</div><div class="chip"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 4h16v14H7l-3 3z"/><path d="M8 9h8M8 13h5"/></svg></div><div class="nm">التقارير</div><div class="ds">تقارير جاهزة</div></div>
+          </div>
+
+          <div class="sec-title"><h4>آخر الإشعارات</h4><a>عرض الكل</a></div>
+          <div class="notif"><div class="nico"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><path d="M21 16l-9 5-9-5M12 2l9 5-9 5-9-5 9-5z"/></svg></div><div class="nbody"><b>طلب إجازة جديد</b><small>سارة خالد — إجازة سنوية ٣ أيام</small></div><div class="nt">قبل ٥د</div></div>
+          <div class="notif"><div class="nico"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="nbody"><b>تنبيه تأخير</b><small>محمد علي سجّل دخول الساعة ٩:٤٢</small></div><div class="nt">قبل ٢٠د</div></div>
+          <div class="notif"><div class="nico"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><rect x="2" y="6" width="20" height="13" rx="2.5"/><circle cx="12" cy="12.5" r="2.6"/></svg></div><div class="nbody"><b>اعتماد كشف المرتبات</b><small>بانتظار موافقتك لشهر مايو</small></div><div class="nt">قبل ١س</div></div>
+        </div>
+
+        <div class="bnav">
+          <div class="it active"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>الرئيسية</div>
+          <div class="it"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/></svg>الموظفين</div>
+          <div class="fab"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg></div>
+          <div class="it"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>الإشعارات</div>
+          <div class="it"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>حسابي</div>
+        </div>
+      </div></div>
+      <div class="hr-label">شاشة الهوم (Home)</div>
+    </div>
+
+    <!-- ============ PROFILE ============ -->
+    <div>
+      <div class="hrp"><div class="hrp-screen">
+        <div class="pf-head">
+          <div class="pf-topbar">
+            <div class="iconbtn" style="background:rgba(255,255,255,.15);border:none;color:#fff;"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="t">حسابي</div>
+            <div class="iconbtn" style="background:rgba(255,255,255,.15);border:none;color:#fff;"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 0 1-4 0v-.1A1.6 1.6 0 0 0 6.6 19l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 3 13.4H3a2 2 0 0 1 0-4h.1A1.6 1.6 0 0 0 4.6 6.6l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 10 4.6V3a2 2 0 0 1 4 0v.1a1.6 1.6 0 0 0 2.7 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7H21a2 2 0 0 1 0 4z"/></svg></div>
+          </div>
+          <div class="pf-id">
+            <div class="pf-ava">أ م</div>
+            <h3>أحمد محمد</h3>
+            <div class="role">مدير موارد بشرية</div>
+            <div class="code">رقم الموظف: EMP-1024</div>
+          </div>
+        </div>
+
+        <div class="pf-stats">
+          <div class="st"><b>21</b><small>أيام الحضور</small></div>
+          <div class="sep"></div>
+          <div class="st"><b>12</b><small>رصيد الإجازات</small></div>
+          <div class="sep"></div>
+          <div class="st"><b>32</b><small>ساعات إضافية</small></div>
+        </div>
+
+        <div class="pad">
+          <div class="sec-title"><h4>معلوماتي</h4></div>
+          <div class="row"><div class="ri" style="background:rgba(194,28,36,.1)"><svg class="ic" viewBox="0 0 24 24" stroke="var(--p)"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div><div class="rt"><b>البريد الإلكتروني</b><small>ahmed.m@locksys.co</small></div></div>
+          <div class="row"><div class="ri" style="background:rgba(59,130,246,.12)"><svg class="ic" viewBox="0 0 24 24" stroke="#3B82F6"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8.1 9.6a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.4c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.9 2z"/></svg></div><div class="rt"><b>رقم الهاتف</b><small>+966 5X XXX XXXX</small></div></div>
+          <div class="row"><div class="ri" style="background:rgba(139,92,246,.12)"><svg class="ic" viewBox="0 0 24 24" stroke="#8B5CF6"><path d="M3 21h18M5 21V7l8-4 8 4v14"/><path d="M9 9h.01M9 13h.01M9 17h.01"/></svg></div><div class="rt"><b>القسم</b><small>الموارد البشرية — المقر الرئيسي</small></div></div>
+          <div class="row"><div class="ri" style="background:rgba(22,163,74,.12)"><svg class="ic" viewBox="0 0 24 24" stroke="#16A34A"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div><div class="rt"><b>تاريخ التعيين</b><small>١٢ يناير ٢٠٢١</small></div></div>
+
+          <div class="sec-title"><h4>روابط سريعة</h4></div>
+          <div class="row"><div class="ri" style="background:rgba(245,158,11,.14)"><svg class="ic" viewBox="0 0 24 24" stroke="#F59E0B"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M9.5 14.5l5 3M14.5 14.5l-5 3"/></svg></div><div class="rt"><b>سجل الغياب</b></div><svg class="ic chev" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="row"><div class="ri" style="background:rgba(59,130,246,.12)"><svg class="ic" viewBox="0 0 24 24" stroke="#3B82F6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="rt"><b>ساعات الإضافي</b></div><span class="rv">32 س</span><svg class="ic chev" viewBox="0 0 24 24" style="margin-right:8px"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="row"><div class="ri" style="background:rgba(22,163,74,.12)"><svg class="ic" viewBox="0 0 24 24" stroke="#16A34A"><path d="M12 2l9 5-9 5-9-5 9-5zM3 12l9 5 9-5"/></svg></div><div class="rt"><b>طلبات الإجازات</b></div><svg class="ic chev" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="row"><div class="ri" style="background:rgba(194,28,36,.1)"><svg class="ic" viewBox="0 0 24 24" stroke="var(--p)"><rect x="2" y="6" width="20" height="13" rx="2.5"/><circle cx="12" cy="12.5" r="2.6"/></svg></div><div class="rt"><b>كشوف المرتبات</b></div><svg class="ic chev" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+
+          <div class="editbtn" style="margin-top:18px"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg> تعديل الملف الشخصي</div>
+          <div class="logout"><svg class="ic" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg> تسجيل الخروج</div>
+          <div style="height:14px"></div>
+        </div>
+      </div></div>
+      <div class="hr-label">شاشة البروفايل (Profile)</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="apply-note">
+  أعجبك ثيم معيّن؟ قل لي اسمه (المعروض أسفل المعاينة) وسأطبّقه مباشرة على
+  <code>lib/theme/app_colors.dart</code> في التطبيق. كل القيم هنا جاهزة للنقل (Primary / Secondary / Accent / Background / Text).
+  <br>وبالنسبة لشاشتي الهوم والبروفايل: لو الشكل عجبك أبنيهم في Flutter بنفس التقسيم ده.
+</div>
+
+<script>
+const themes = [
+  { id:'crimson',  name:'Crimson Corporate', desc:'أحمر مؤسسي زاهٍ — الحالي تقريبًا، رسمي وأنيق.',
+    primary:'#C21C24', secondary:'#8B1214', accent:'#E55B5F', bg:'#F4F6F8', text:'#1E242B' },
+  { id:'ruby',     name:'Ruby Modern', desc:'روبي عصري حيوي، مناسب لتطبيق شبابي راقٍ.',
+    primary:'#E11D48', secondary:'#9F1239', accent:'#FB7185', bg:'#FBF7F8', text:'#1F2937' },
+  { id:'scarlet',  name:'Scarlet Clean', desc:'قرمزي نظيف وواضح، تباين عالٍ وقراءة مريحة.',
+    primary:'#DC2626', secondary:'#991B1B', accent:'#F87171', bg:'#F8FAFC', text:'#111827' },
+  { id:'maroon',   name:'Maroon Executive', desc:'مارون تنفيذي هادئ وفخم، إحساس بريميوم.',
+    primary:'#A11D24', secondary:'#6D0F14', accent:'#D14B50', bg:'#F5F3F2', text:'#221A1B' },
+  { id:'cherry',   name:'Cherry Premium', desc:'كرزي راقٍ يميل للوردي الداكن، أنثوي/فاخر.',
+    primary:'#B91C3C', secondary:'#7A1228', accent:'#E76A82', bg:'#FBF6F7', text:'#1A1418' },
+  { id:'coral',    name:'Coral Soft', desc:'أحمر مرجاني ناعم ودافئ، ودود وعصري.',
+    primary:'#EF4444', secondary:'#B91C1C', accent:'#FCA5A5', bg:'#F7F8FA', text:'#1F2430' },
+  { id:'wine',     name:'Wine Deep', desc:'نبيذي عميق وغني، رسمي جدًا وجاد.',
+    primary:'#9B1B30', secondary:'#5E0E1D', accent:'#C8455A', bg:'#F4F5F7', text:'#1B1A1C' },
+  { id:'rosered',  name:'Rose Tech', desc:'وردي–أحمر تقني نظيف، حديث ومتوازن.',
+    primary:'#D81E5B', secondary:'#9D1342', accent:'#F25C8A', bg:'#FAF7F9', text:'#171A21' },
+];
+
+let currentStyle = 'solid';
+let currentTheme = themes[0];
+
+function gradient(t){ return `linear-gradient(135deg, ${t.primary}, ${t.secondary})`; }
+
+function applyTheme(t){
+  currentTheme = t;
+  const r = document.documentElement.style;
+  r.setProperty('--primary', t.primary);
+  r.setProperty('--secondary', t.secondary);
+  r.setProperty('--accent', t.accent);
+  r.setProperty('--bg', t.bg);
+  r.setProperty('--text', t.text);
+  document.getElementById('curName').textContent = t.name;
+  document.querySelectorAll('.theme-card').forEach(c=>c.classList.toggle('selected', c.dataset.id===t.id));
+  paintButton();
+}
+
+function paintButton(){
+  const btn = document.getElementById('primaryBtn');
+  btn.style.background = currentStyle==='gradient' ? gradient(currentTheme) : currentTheme.primary;
+}
+
+function buildGallery(){
+  const g = document.getElementById('gallery');
+  g.innerHTML = themes.map(t=>`
+    <div class="theme-card" data-id="${t.id}" style="--cardPrimary:${t.primary}">
+      <span class="selected-tag">محدد</span>
+      <div class="name">${t.name}</div>
+      <div class="desc">${t.desc}</div>
+      <div class="swatches">
+        <div class="swatch" style="background:${t.primary}"></div>
+        <div class="swatch" style="background:${t.secondary}"></div>
+        <div class="swatch" style="background:${t.accent}"></div>
+        <div class="swatch" style="background:${t.bg}"></div>
+        <div class="swatch" style="background:${t.text}"></div>
+      </div>
+      <div class="mini-gradient" style="background:${gradient(t)}"></div>
+      <div class="mini-row">
+        <div class="mini-btn" style="background:${t.primary}">تسجيل الدخول</div>
+        <div class="mini-chip" style="background:color-mix(in srgb,${t.accent} 18%,transparent);color:${t.primary}">أو</div>
+      </div>
+    </div>`).join('');
+  g.querySelectorAll('.theme-card').forEach(c=>{
+    c.addEventListener('click',()=>applyTheme(themes.find(t=>t.id===c.dataset.id)));
+  });
+}
+
+document.querySelectorAll('#btnStyleToggle button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('#btnStyleToggle button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    currentStyle = b.dataset.style;
+    paintButton();
+  });
+});
+
+buildGallery();
+applyTheme(themes[0]);
+</script>
+</body>
+</html>

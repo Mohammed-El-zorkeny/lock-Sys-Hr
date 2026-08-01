@@ -1,0 +1,7 @@
+{
+  "@@locale": "ar",
+  "appName": "لوكسيس HR",
+  "@appName": {
+    "description": "Application display name"
+  }
+}

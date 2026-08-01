@@ -1,0 +1,931 @@
+{
+    "info": {
+        "_postman_id": "3748da61-f9b2-4a56-a637-1fad4043d7c9",
+        "name": "LockSys API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "_exporter_id": "55785725",
+        "_collection_link": "https://go.postman.co/collection/55785725-3748da61-f9b2-4a56-a637-1fad4043d7c9?source=collection_link"
+    },
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "const res = pm.response.json();",
+                                    "",
+                                    "if (res.status === 'success') {",
+                                    "    pm.collectionVariables.set('token', res.token);",
+                                    "    pm.collectionVariables.set('company_id', res.user.defaultCompanyId);",
+                                    "    pm.collectionVariables.set('branch_id', res.user.defaultBranchId);",
+                                    "    console.log('✅ Token saved:', res.token);",
+                                    "    console.log('🏢 Company ID:', res.user.defaultCompanyId);",
+                                    "    console.log('🏬 Branch ID:', res.user.defaultBranchId);",
+                                    "} else {",
+                                    "    console.error('❌ Login failed:', res.messageEn);",
+                                    "}"
+                                ],
+                                "type": "text/javascript",
+                                "packages": {},
+                                "requests": {}
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"Admin\",\n    \"password\": \"Marv@2014\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/Users/LoginUser",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "Users",
+                                "LoginUser"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Profile",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/Users/GetInfoUser",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "Users",
+                                "GetInfoUser"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get My Sites",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/Users/MySites",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "Users",
+                                "MySites"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "My Site Locations",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/Users/SiteLocations",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "Users",
+                                "SiteLocations"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get MyT rips",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/Users/MySites",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "Users",
+                                "MySites"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Device Token",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n    \"deviceToken\": \"fcm_token_here\",\r\n    \"deviceType\": \"android\",\r\n    \"deviceName\": \"Samsung Galaxy S24\",\r\n    \"appVersion\": \"1.0.0\",\r\n    \"phoneNumber\": \"01012345678\"\r\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/Users/UpdateDeviceToken",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "Users",
+                                "UpdateDeviceToken"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Change Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n  \"oldPassword\": \"123\",\r\n  \"newPassword\": \"123\"\r\n}\r\n",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/Users/ChangePassword",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "Users",
+                                "ChangePassword"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Log Activity",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n  \"screenName\": \"CHECK_IN\", // أو LOGIN, TRIPS, DAILIES, PROFILE\r\n  \"deviceUuid\": \"كود الهاتف الفريد\",\r\n  \"notes\": \"أي ملاحظات إضافية\"\r\n}\r\n",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/Users/LogActivity",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "Users",
+                                "LogActivity"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Check In And Out",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n    \"checkType\": \"IN\",\r\n    \"attendanceDate\": \"12/06/2026\",\r\n    \"actualTime\": \"08:30\",\r\n    \"latitude\": \"30.0444\",\r\n    \"longitude\": \"31.2357\",\r\n    \"isFake\": 0,\r\n    \"fakeLatitude\": null,\r\n    \"fakeLongitude\": null,\r\n    \"notes\": \"\"\r\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/Users/CheckInAndOut",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "Users",
+                                "CheckInAndOut"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Trips",
+            "item": [
+                {
+                    "name": "Get My Trips",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/Trips/MyTrips",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "Trips",
+                                "MyTrips"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Start Trip",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n    \"tripId\": 1,\r\n    \"latitude\": \"30.662556\",\r\n    \"longitude\": \"31.438651\",\r\n    \"isFake\": 0\r\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/Trips/StartTripId",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "Trips",
+                                "StartTripId"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "End Trip",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n    \"tripId\": 2,\r\n    \"latitude\": \"30.701234\",\r\n    \"longitude\": \"31.452890\",\r\n    \"isFake\": 0,\r\n    \"notes\": \"تمت الزيارة بنجاح\"\r\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/Trips/EndTripId",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "Trips",
+                                "EndTripId"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "End Trip Copy",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n    \"tripId\": 2,\r\n    \"latitude\": \"30.701234\",\r\n    \"longitude\": \"31.452890\",\r\n    \"isFake\": 0,\r\n    \"notes\": \"تمت الزيارة بنجاح\"\r\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/Trips/EndTripId",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "Trips",
+                                "EndTripId"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Cancel Trip",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n    \"tripId\": 1,\r\n    \"cancelledReason\": \"تم تأجيل المهمة من الإدارة\"\r\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/Trips/CancelTripId",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "Trips",
+                                "CancelTripId"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Attachment",
+            "item": []
+        },
+        {
+            "name": "My Employees",
+            "item": [
+                {
+                    "name": "Present",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/MyEmployees/Present",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "MyEmployees",
+                                "Present"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Check Employee Status",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/MyEmployees/CheckEmployeeStatus?employee_id=5036&date_filter=24-06-2026",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "MyEmployees",
+                                "CheckEmployeeStatus"
+                            ],
+                            "query": [
+                                {
+                                    "key": "employee_id",
+                                    "value": "5036"
+                                },
+                                {
+                                    "key": "date_filter",
+                                    "value": "24-06-2026"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Count Days Absence",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/MyEmployees/CheckEmployeeStatus?employee_id=5036&date_filter=24-06-2026",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "MyEmployees",
+                                "CheckEmployeeStatus"
+                            ],
+                            "query": [
+                                {
+                                    "key": "employee_id",
+                                    "value": "5036"
+                                },
+                                {
+                                    "key": "date_filter",
+                                    "value": "24-06-2026"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Leave Balance",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/MyEmployees/Present?date=11-06-2026",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "MyEmployees",
+                                "Present"
+                            ],
+                            "query": [
+                                {
+                                    "key": "date",
+                                    "value": "11-06-2026"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Additional",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n    \"employeeId\": 5036,\r\n    \"ctoDate\": \"22-06-2026\",\r\n    \"ctoHours\": 4,\r\n    \"ctoTransactionTypeId\": 1,\r\n    \"notes\": \"ساعات إضافية يوم الجمعة\"\r\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/MyEmployees/Additional",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "MyEmployees",
+                                "Additional"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "No Active Cto",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/MyEmployees/NotActiveCto?id=18",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "MyEmployees",
+                                "NotActiveCto"
+                            ],
+                            "query": [
+                                {
+                                    "key": "id",
+                                    "value": "18"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Overtime Requests",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n  \"fromTime\": \"17:00\",\r\n  \"toTime\": \"20:00\",\r\n  \"notes\": \"إضافي مساء\",\r\n  \"status\": 0\r\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/MyEmployees/UpdateOvertimeRequests?id=1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "MyEmployees",
+                                "UpdateOvertimeRequests"
+                            ],
+                            "query": [
+                                {
+                                    "key": "id",
+                                    "value": "1"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Work permits",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n    \"employeeId\": 5036,\r\n    \"permitDate\": \"12/06/2026\",\r\n    \"notes\": \"تصريح عمل إضافي\"\r\n}\r\n\r\n",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/MyEmployees/Workpermits",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "MyEmployees",
+                                "Workpermits"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Attachment",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/attachment/session/815206",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "attachment",
+                                "session",
+                                "815206"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Missions",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"employeeId\": 5036,\n    \"startDate\": \"15/06/2026\",\n    \"endDate\": \"17/06/2026\",\n    \"missionTypeId\": 1,\n    \"destination\": \"الإسكندرية\",\n    \"missionPurpose\": \"متابعة مشروع الفرع الجديد\",\n    \"notes\": \"\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/MyEmployees/Missions",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "MyEmployees",
+                                "Missions"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Absence",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n    \"employeeId\": 5036,\r\n    \"absenceDate\": \"11/06/2026\",\r\n    \"endDate\": \"12/06/2026\",\r\n    \"absenceReason\": \"غياب بدون إذن\",\r\n    \"notes\": \"\"\r\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/MyEmployees/Absence",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "MyEmployees",
+                                "Absence"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Overtime",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n    \"employeeId\": 5036,\r\n    \"absenceDate\": \"11/06/2026\",\r\n    \"endDate\": \"12/06/2026\",\r\n    \"absenceReason\": \"غياب بدون إذن\",\r\n    \"notes\": \"\"\r\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/MyEmployees/Absence",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "MyEmployees",
+                                "Absence"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "leaveRequests",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n    \"employeeId\": 5036,\r\n    \"leaveTypeId\": 1,\r\n    \"startDate\": \"15/06/2026\",\r\n    \"endDate\": \"17/06/2026\"\r\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/MyEmployees/leaveRequests",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "MyEmployees",
+                                "leaveRequests"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Mission Types",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/MyEmployees/MissionType",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "MyEmployees",
+                                "MissionType"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Leave",
+            "item": [
+                {
+                    "name": "Present",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/Leave/LeaveType",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "Leave",
+                                "LeaveType"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "https://api.locksys.co/ords/locksysapp"
+        },
+        {
+            "key": "token",
+            "value": ""
+        },
+        {
+            "key": "company_id",
+            "value": ""
+        },
+        {
+            "key": "branch_id",
+            "value": ""
+        }
+    ]
+}

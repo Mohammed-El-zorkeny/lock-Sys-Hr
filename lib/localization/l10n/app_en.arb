@@ -1,0 +1,7 @@
+{
+  "@@locale": "en",
+  "appName": "LockSys HR",
+  "@appName": {
+    "description": "Application display name"
+  }
+}
